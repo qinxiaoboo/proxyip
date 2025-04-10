@@ -1,0 +1,170 @@
+{
+   "About": {
+      "message": "Информация"
+   },
+   "Blacklist": {
+      "message": "Чёрный список"
+   },
+   "General": {
+      "message": "Основные"
+   },
+   "Help": {
+      "message": "Помощь"
+   },
+   "Options": {
+      "message": "Настройки"
+   },
+   "Rules": {
+      "message": "Правила"
+   },
+   "Whitelist": {
+      "message": "Белый список"
+   },
+   "advanced_settings": {
+      "message": "Дополнительные настройки"
+   },
+   "appDesc": {
+      "message": "Управление прокси в браузере Google Chrome"
+   },
+   "appName": {
+      "message": "Помощник прокси"
+   },
+   "authConfig": {
+      "message": "Аутентификация"
+   },
+   "authentication": {
+      "message": "Настройки аутентификации"
+   },
+   "auto_detect_set": {
+      "message": "Автоматически"
+   },
+   "bypass_list": {
+      "message": "Белый список"
+   },
+   "cancel": {
+      "message": "Отмена"
+   },
+   "config_auto": {
+      "message": "Автоматическая настройка"
+   },
+   "config_bypasslist": {
+      "message": "Белый список прокси"
+   },
+   "config_manual": {
+      "message": "Ручная настройка"
+   },
+   "config_proxylist": {
+      "message": "Чёрный список для прокси"
+   },
+   "direct_proxy": {
+      "message": "Без прокси"
+   },
+   "domain_in_bypasslist": {
+      "message": "Имена в белом списке не будут использовать прокси"
+   },
+   "domain_in_proxy": {
+      "message": "Домены в чёрном списке будут использовать прокси"
+   },
+   "download": {
+      "message": "Загрузить"
+   },
+   "edit": {
+      "message": "Изменить"
+   },
+   "edit_pac_data": {
+      "message": "Редактировать PAC-скрипт"
+   },
+   "http_proxy": {
+      "message": "HTTP-прокси:"
+   },
+   "http_proxy_set": {
+      "message": "HTTP-прокси"
+   },
+   "https_proxy": {
+      "message": "HTTPS-прокси:"
+   },
+   "https_proxy_set": {
+      "message": "HTTPS-прокси"
+   },
+   "online_pac_script": {
+      "message": "Использовать PAC-скрипт из сети"
+   },
+   "pac_data": {
+      "message": "PAC-скрипт"
+   },
+   "pac_data_set": {
+      "message": "PAC-скрипт"
+   },
+   "pac_path": {
+      "message": "PAC-файл:"
+   },
+   "pac_script": {
+      "message": "PAC-скрипт"
+   },
+   "pac_url": {
+      "message": "Адрес PAC"
+   },
+   "pac_url_set": {
+      "message": "URL PAC-файла"
+   },
+   "pass": {
+      "message": "Пароль:"
+   },
+   "password_authentication": {
+      "message": "Использовать пароль"
+   },
+   "port": {
+      "message": "Порт:"
+   },
+   "proxy": {
+      "message": "Прокси"
+   },
+   "proxy_helper_options": {
+      "message": "Настройки «Помощника прокси»"
+   },
+   "proxy_information": {
+      "message": "Настройки прокси"
+   },
+   "proxy_rules": {
+      "message": "Режим прокси:"
+   },
+   "proxy_servers": {
+      "message": "Прокси"
+   },
+   "quic_proxy": {
+      "message": "QUIC-прокси:"
+   },
+   "quic_proxy_set": {
+      "message": "QUIC-прокси"
+   },
+   "return": {
+      "message": "Назад"
+   },
+   "rules_mode": {
+      "message": "Настройка режима правил"
+   },
+   "save": {
+      "message": "Сохранить"
+   },
+   "show_adv": {
+      "message": "Показывать дополнительные настройки"
+   },
+   "socks_proxy": {
+      "message": "SOCKS-прокси:"
+   },
+   "socks_proxy_set": {
+      "message": "SOCKS-прокси"
+   },
+   "system_proxy": {
+      "message": "Системный"
+   },
+   "title": {
+      "message": "Помощник прокси"
+   },
+   "use_predefine_list": {
+      "message": "Использовать встроенный белый список"
+   },
+   "user": {
+      "message": "Пользователь:"
+   }
+}

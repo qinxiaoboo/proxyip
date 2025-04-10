@@ -1,0 +1,110 @@
+{
+   "About": {
+      "message": "プロキシーヘルパーについて"
+   },
+   "General": {
+      "message": "全般"
+   },
+   "Help": {
+      "message": "ヘルプ"
+   },
+   "Options": {
+      "message": "オプション"
+   },
+   "Rules": {
+      "message": "ルール"
+   },
+   "Whitelist": {
+      "message": "ホワイトリスト"
+   },
+   "advanced_settings": {
+      "message": "詳細設定"
+   },
+   "appDesc": {
+      "message": "Google Chromeのプロキシーサーバーを設定します"
+   },
+   "appName": {
+      "message": "プロキシーヘルパー"
+   },
+   "authConfig": {
+      "message": "認証"
+   },
+   "authentication": {
+      "message": "認証情報"
+   },
+   "auto_detect_set": {
+      "message": "自動検出"
+   },
+   "config_bypasslist": {
+      "message": "プロキシーを経由しない接続先リスト"
+   },
+   "direct_proxy": {
+      "message": "プロキシーなし"
+   },
+   "domain_in_bypasslist": {
+      "message": "プロキシーを経由しないホスト名のリスト"
+   },
+   "http_proxy": {
+      "message": "HTTPプロキシー:"
+   },
+   "http_proxy_set": {
+      "message": "HTTPプロキシー"
+   },
+   "https_proxy": {
+      "message": "HTTPSプロキシー:"
+   },
+   "https_proxy_set": {
+      "message": "HTTPSプロキシー"
+   },
+   "pac_data": {
+      "message": "PACファイル"
+   },
+   "pac_data_set": {
+      "message": "PACスクリプト"
+   },
+   "pac_script": {
+      "message": "PACスクリプト:"
+   },
+   "pac_url_set": {
+      "message": "PAC URL"
+   },
+   "pass": {
+      "message": "パスワード:"
+   },
+   "port": {
+      "message": "ポート:"
+   },
+   "proxy_rules": {
+      "message": "プロキシールール: "
+   },
+   "proxy_servers": {
+      "message": "プロキシーサーバー"
+   },
+   "quic_proxy": {
+      "message": "QUICプロキシー:"
+   },
+   "quic_proxy_set": {
+      "message": "QUICプロキシー"
+   },
+   "rules_mode": {
+      "message": "ルールのモード"
+   },
+   "socks_proxy": {
+      "message": "SOCKSプロキシー:"
+   },
+   "socks_proxy_set": {
+      "message": "SOCKSプロキシー"
+   },
+   "system_proxy": {
+      "message": "システムプロキシー"
+   },
+   "title": {
+      "message": "プロキシーヘルパー"
+   },
+   "use_predefine_list": {
+      "message": "既定のプロキシーを経由しない接続先リストを利用する"
+   },
+   "user": {
+      "message": "ユーザー:"
+   }
+}
