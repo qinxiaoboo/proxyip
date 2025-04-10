@@ -104,7 +104,7 @@ chrome.runtime.onInstalled.addListener(function(details){
             console.log("install success")
         }else{
             localStorage.proxySetting = JSON.stringify(proxySetting);
-            gotoPage('options.html');
+
         }
         
     }
