@@ -79,7 +79,7 @@ function color_proxy_item() {
 
     chrome.proxy.settings.get({'incognito': false},
       function(config) {
-        console.log("JSON.stringify(config):",JSON.stringify(config));
+        //console.log(JSON.stringify(config));
         mode = config['value']['mode'];
         rules = config['value']['rules'];
 
@@ -139,7 +139,7 @@ function iconSet(str) {
     if (str == 'off') {
         icon['path'] = 'images/off.png';
     }
-    chrome.browserAction.setIcon(icon);
+    chrome.action.setIcon(icon);
 }
 
 function proxySelected(str) {
@@ -376,7 +376,7 @@ function autoProxy() {
 
 
 chrome.proxy.onProxyError.addListener(function(details) {
-    console.log("details.error:",details.error);
+    console.log(details.error);
 });
 
 
@@ -393,7 +393,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if(httpHost && httpPort){
         document.querySelector('#http-proxy').click();
     }
-    
     $('[data-i18n-content]').each(function() {
         var message = chrome.i18n.getMessage(this.getAttribute('data-i18n-content'));
         if (message)

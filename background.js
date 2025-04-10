@@ -1,4 +1,4 @@
-
+var localStorage = {};
 
 function setProxyIcon() {
 
@@ -10,38 +10,37 @@ function setProxyIcon() {
                 {'incognito': false},
         function(config) {
             if (config["value"]["mode"] == "system") {
-                chrome.browserAction.setIcon(icon);
+                chrome.action.setIcon(icon);
             } else if (config["value"]["mode"] == "direct") {
-                chrome.browserAction.setIcon(icon);
+                chrome.action.setIcon(icon);
             } else {
                 icon["path"] = "images/on.png";
-                chrome.browserAction.setIcon(icon);
+                chrome.action.setIcon(icon);
             }
         }
     );
 }
 
 function gotoPage(url) {
-    console.log("gotoPage:  ",url)
 
-    var fulurl = chrome.extension.getURL(url);
-    chrome.tabs.getAllInWindow(undefined, function(tabs) {
-        for (var i in tabs) {
-            tab = tabs[i];
-            if (tab.url == fulurl) {
-                chrome.tabs.update(tab.id, { selected: true });
-                return;
-            }
+    var fulurl = chrome.runtime.getURL(url);
+    chrome.tabs.query({ url: fulurl }, function(tabs) {
+        if (tabs.length) {
+            chrome.tabs.update(tabs[0].id, { selected: true });
+            chrome.windows.update(tabs[0].windowId, { focused: true });
+            return;
         }
-        chrome.tabs.getSelected(null, function(tab) {
-                    chrome.tabs.create({url: url,index: tab.index + 1});
-        });
+        chrome.tabs.create({url: url, active: true});
     });
 }
 
-function callbackFn(details) {
+async function callbackFn(details, cb) {
+    console.log("%s onAuthRequiredCB", new Date(Date.now()).toISOString());
+
+    if (localStorage.proxySetting == undefined)
+        await getLocalStorage();
+
     var proxySetting = JSON.parse(localStorage.proxySetting);
-    console.log("callbackFn proxySetting:",proxySetting)
 
     if (proxySetting){
         var auth = proxySetting['auth'];
@@ -51,15 +50,36 @@ function callbackFn(details) {
 
     if (proxySetting['auth']['user'] == '' && 
         proxySetting['auth']['pass'] == '')
-        return {};
+        cb({});
 
-    return { authCredentials: {username: username, password: password} };
+    cb({ authCredentials: {username: username, password: password} });
 }
 
 chrome.webRequest.onAuthRequired.addListener(
             callbackFn,
             {urls: ["<all_urls>"]},
-            ['blocking'] );
+            ['asyncBlocking'] );
+
+chrome.runtime.onMessage.addListener((msg, sender, res) => {
+    if (msg.action != "authUpdate")
+        return;
+
+    (async () => {
+        console.log("%s receive authUpdate", new Date(Date.now()).toISOString());
+        if (localStorage.proxySetting == undefined)
+            await getLocalStorage();
+
+        var proxySetting = JSON.parse(localStorage.proxySetting);
+        proxySetting['auth'] = msg.data;
+        localStorage.proxySetting = JSON.stringify(proxySetting);
+        await chrome.storage.local.set(localStorage);
+
+        console.log("%s sending authUpdate response", new Date(Date.now()).toISOString());
+        res('done');
+    })();
+
+    return true;
+});
 
 var proxySetting = {
     'pac_script_url' : {'http': '', 'https': '', 'file' : ''},
@@ -78,7 +98,7 @@ var proxySetting = {
     'rules_mode' : 'Whitelist'
 }
 
-var chinaList = ['*.cn', '*.com.cn', '*.net.cn', '*.org.cn']
+var chinaList = ['*.cn']
 
 localStorage.chinaList = JSON.stringify(chinaList);
 
@@ -98,15 +118,31 @@ function getBypass() {
     }
 }
 
-chrome.runtime.onInstalled.addListener(function(details){
-    if(details.reason == "install") {
-        if(localStorage.proxySetting){
-            console.log("install success")
-        }else{
-            localStorage.proxySetting = JSON.stringify(proxySetting);
+chrome.runtime.onInstalled.addListener(async details => {
+    var store = await getLocalStorage();
+    if (store.proxySetting == undefined) {
+        localStorage.proxySetting = JSON.stringify(proxySetting);
+        await chrome.storage.local.set(localStorage);
+        if (details.reason == "update") {
+            chrome.runtime.onMessage.addListener((msg, sender, res) => {
+                if (msg.action != "migrationDone")
+                    return;
 
+                console.log("%s data migration done", new Date(Date.now()).toISOString());
+                chrome.offscreen.closeDocument();
+            });
+
+            console.log("%s starting data migration", new Date(Date.now()).toISOString());
+            chrome.offscreen.createDocument({
+                url: 'migration.html',
+                reasons: ['LOCAL_STORAGE'],
+                justification: 'Migrate storage data for MV2 to MV3',
+            });
         }
-        
+    }
+    if(details.reason == "install") {
+        // gotoPage('options.html');
+        console.log("install success")
     }
 /*
     else if(details.reason == "update") {
@@ -115,6 +151,17 @@ chrome.runtime.onInstalled.addListener(function(details){
 */
 });
 
+function getLocalStorage() {
+    console.trace("%s getLocalStorage", new Date(Date.now()).toISOString());
+    return chrome.storage.local.get(null).then(result => {
+        console.log("%s getLocalStorage: result = %O", new Date(Date.now()).toISOString(), result);
+        if (result.proxySetting != undefined) {
+            Object.assign(localStorage, result);
+        }
+        return result;
+    });
+}
+
 
 chrome.commands.onCommand.addListener(function(command) {
   if (command == 'open-option')
@@ -122,12 +169,10 @@ chrome.commands.onCommand.addListener(function(command) {
 });
 
 // sync extension settings from google cloud
-/*
-chrome.storage.sync.get('proxySetting', function(val) {
-    if (typeof val.proxySetting !== "undefined")
-        localStorage.proxySetting = val.proxySetting;
-});
-*/
+//chrome.storage.sync.get('proxySetting', function(val) {
+//    if (typeof val.proxySetting !== "undefined")
+//        localStorage.proxySetting = val.proxySetting;
+//});
 
 chrome.proxy.onProxyError.addListener(function(details) {
     console.log("fatal: ", details.fatal);
@@ -135,6 +180,7 @@ chrome.proxy.onProxyError.addListener(function(details) {
     console.log("details: ", details.details)
 });
 
+console.log("%s service worker initialized", new Date(Date.now()).toISOString());
 setProxyIcon();
 
 // sync bypass list from github.com

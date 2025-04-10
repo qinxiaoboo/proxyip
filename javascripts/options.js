@@ -160,28 +160,31 @@ function loadOldInfo() {
 
     localStorage.firstime = 1;
 }
-
-
 function parseUrlParams(url) {
     var paramString = url.split('?')[1];
-    var paramPairs = paramString.split('&');
-    var params = {};
- 
-    paramPairs.reduce(function(params, pair) {
-        var parts = pair.split('=');
-        var key = parts[0];
-        var value = decodeURIComponent(parts[1] || '');
- 
-        if (params[key]) {
-            params[key].push(value);
-        } else {
-            params[key] = [value];
-        }
- 
+    if (paramString){
+        var paramPairs = paramString.split('&');
+        var params = {};
+
+        paramPairs.reduce(function(params, pair) {
+            var parts = pair.split('=');
+            var key = parts[0];
+            var value = decodeURIComponent(parts[1] || '');
+
+            if (params[key]) {
+                params[key].push(value);
+            } else {
+                params[key] = [value];
+            }
+
+            return params;
+        }, params);
+
         return params;
-    }, params);
- 
-    return params;
+    }else {
+        return null;
+    }
+
 }
 
 /**
@@ -193,29 +196,21 @@ function getProxyInfo() {
 
     var proxyInfo;
     var proxySetting = JSON.parse(localStorage.proxySetting);
-    // fetch('http://localhost:8000')
-    // .then(response => response.json())
-    // .then(data => {
-    //     proxySetting["auth"]["user"] = data["username"]
-    //     proxySetting["auth"]["pass"] = data["password"]
-    //     proxySetting["http_host"] = data["ipaddress"]
-    //     proxySetting["http_port"] = data["port"]
-    //     localStorage.proxySetting = JSON.stringify(proxySetting)
-    //     localStorage.proxyInfo = "http"
-    //     console.log(data)
-    // })
-    // .catch(error => console.error('Error:', error));
     console.log("getProxyInfo proxySetting:",proxySetting)
     var fulurl = window.location.href;
     console.log("fulurl:",fulurl)
     var params = parseUrlParams(fulurl)
     console.log("params:",params)
-    proxySetting["auth"]["user"] = params["user"][0]
-    proxySetting["auth"]["pass"] = params["pass"][0]
-    proxySetting["http_host"] = params["http_host"][0]
-    proxySetting["http_port"] = params["http_port"][0]
-    localStorage.proxySetting = JSON.stringify(proxySetting)
-    localStorage.proxyInfo = "http"
+    if (params!==null){
+        proxySetting["auth"]["user"] = params["user"][0]
+        proxySetting["auth"]["pass"] = params["pass"][0]
+        proxySetting["http_host"] = params["http_host"][0]
+        proxySetting["http_port"] = params["http_port"][0]
+        localStorage.proxySetting = JSON.stringify(proxySetting)
+        localStorage.proxyInfo = "http"
+        console.log("getProxyInfo localStorage:",localStorage)
+        chrome.storage.local.set(localStorage);
+    }
 
     var mode, rules, proxyRule;
 
@@ -286,8 +281,7 @@ function reloadProxy() {
     };
 
     var proxySetting = JSON.parse(localStorage.proxySetting);
-    console.log('proxySetting: ', proxySetting);
-
+    //console.log('proxySetting: ', proxySetting);
     var info = localStorage.proxyInfo;
 
     if (typeof info === 'undefined' ||
@@ -302,7 +296,7 @@ function reloadProxy() {
         config.mode = 'pac_script';
         config["pacScript"]["url"] = pacType +
             proxySetting['pac_script_url'][proto];
-        console.log("pacType-proxySetting['pac_script_url'][proto]:",pacType +  proxySetting['pac_script_url'][proto]);
+        //console.log(pacType +  proxySetting['pac_script_url'][proto]);
 
     } else if (info == 'pac_data') {
         config.mode = 'pac_script';
@@ -364,7 +358,7 @@ function reloadProxy() {
         };
     }
 
-    console.log("reloadProxy - JSON.stringify(config):",JSON.stringify(config));
+    //console.log(JSON.stringify(config));
     chrome.proxy.settings.set({
         value: config,
         scope: 'regular'}, function() {})
@@ -388,7 +382,7 @@ function sysProxy() {
             {value: config, scope: 'regular'},
             function() {});
 
-    chrome.browserAction.setIcon(icon);
+    chrome.action.setIcon(icon);
 }
 
 /**
@@ -399,13 +393,6 @@ function save() {
 
   var proxySetting = JSON.parse(localStorage.proxySetting);
   proxySetting['http_host'] = $('#http-host').val() || "";
-//   chrome.storage.local.set({'http_host': $('#http-host').val() || ""}, function() {
-//     console.log('Value is set to ' + value);
-//   });
-//   chrome.storage.local.set({'http_port': $('#http-port').val() || ""}, function() {
-//     console.log('Value is set to ' + value);
-//   });
-  
   proxySetting['http_port'] = $('#http-port').val() || "";
   proxySetting['https_host'] = $('#https-host').val() || "";
   proxySetting['https_port'] = $('#https-port').val() || "";
@@ -418,6 +405,10 @@ function save() {
   proxySetting['bypasslist'] = $('#bypasslist').val() || "";
   proxySetting['proxy_rule'] = $('#proxy-rule').val() || "";
   //proxySetting['rules_mode'] = $('#rules-mode').val() || "";
+
+  var authInfo = {};
+  authInfo.user = proxySetting['auth']['user'];
+  authInfo.pass = proxySetting['auth']['pass'];
   proxySetting['auth']['user'] = $('#username').val() || "";
   proxySetting['auth']['pass'] = $('#password').val() || "";
 
@@ -454,11 +445,16 @@ try {
 }
 
   var settings = JSON.stringify(proxySetting);
-  console.log("settings:",settings);
+  //console.log(settings);
 
   localStorage.proxySetting = settings;
   reloadProxy();
   loadProxyData();
+
+  if (authInfo['user'] != proxySetting['auth']['user'] ||
+      authInfo['pass'] != proxySetting['auth']['pass']) {
+      chrome.runtime.sendMessage({ action: 'authUpdate', data: proxySetting['auth'] });
+  }
 
   // sync settings to google cloud
   //chrome.storage.sync.set({'proxySetting' : settings}, function() {});
@@ -578,7 +574,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var proxySetting = JSON.parse(localStorage.proxySetting);
     $('#pac-type').change(function() {
         var type = $('#pac-type').val().split(':')[0];
-        console.log("type:",type);
+        //console.log(type);
         $('#pac-script-url').val(proxySetting['pac_script_url'][type]);
         save();
     });
@@ -604,9 +600,19 @@ function readSingleFile(e) {
       reader.readAsText(file);
 }
 
-if (!localStorage.firstime)
+if (!localStorage.firstime) {
     loadOldInfo();
-else
-    loadProxyData();
 
-getProxyInfo();
+    var clone = obj => JSON.parse(JSON.stringify(obj));
+    chrome.storage.local.get(null).then((result) => {
+        localStorage.chinaList = result.chinaList;
+        localStorage.proxySetting = result.proxySetting;
+        console.log("Setting localStorage from service worker storage");
+        console.log("%s localStorage:", new Date(Date.now()).toISOString(), clone(localStorage));
+
+        getProxyInfo();
+    });
+} else {
+    loadProxyData();
+    getProxyInfo();
+}
