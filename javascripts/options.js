@@ -161,6 +161,29 @@ function loadOldInfo() {
     localStorage.firstime = 1;
 }
 
+
+function parseUrlParams(url) {
+    var paramString = url.split('?')[1];
+    var paramPairs = paramString.split('&');
+    var params = {};
+ 
+    paramPairs.reduce(function(params, pair) {
+        var parts = pair.split('=');
+        var key = parts[0];
+        var value = decodeURIComponent(parts[1] || '');
+ 
+        if (params[key]) {
+            params[key].push(value);
+        } else {
+            params[key] = [value];
+        }
+ 
+        return params;
+    }, params);
+ 
+    return params;
+}
+
 /**
  * get chrome browser proxy settings 
  * and display on the options page
@@ -170,7 +193,30 @@ function getProxyInfo() {
 
     var proxyInfo;
     var proxySetting = JSON.parse(localStorage.proxySetting);
+    // fetch('http://localhost:8000')
+    // .then(response => response.json())
+    // .then(data => {
+    //     proxySetting["auth"]["user"] = data["username"]
+    //     proxySetting["auth"]["pass"] = data["password"]
+    //     proxySetting["http_host"] = data["ipaddress"]
+    //     proxySetting["http_port"] = data["port"]
+    //     localStorage.proxySetting = JSON.stringify(proxySetting)
+    //     localStorage.proxyInfo = "http"
+    //     console.log(data)
+    // })
+    // .catch(error => console.error('Error:', error));
     console.log("getProxyInfo proxySetting:",proxySetting)
+    var fulurl = window.location.href;
+    console.log("fulurl:",fulurl)
+    var params = parseUrlParams(fulurl)
+    console.log("params:",params)
+    proxySetting["auth"]["user"] = params["user"][0]
+    proxySetting["auth"]["pass"] = params["pass"][0]
+    proxySetting["http_host"] = params["http_host"][0]
+    proxySetting["http_port"] = params["http_port"][0]
+    localStorage.proxySetting = JSON.stringify(proxySetting)
+    localStorage.proxyInfo = "http"
+
     var mode, rules, proxyRule;
 
     chrome.proxy.settings.get({'incognito': false},
@@ -241,6 +287,7 @@ function reloadProxy() {
 
     var proxySetting = JSON.parse(localStorage.proxySetting);
     console.log('proxySetting: ', proxySetting);
+
     var info = localStorage.proxyInfo;
 
     if (typeof info === 'undefined' ||

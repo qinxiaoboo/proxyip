@@ -390,7 +390,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#sys-proxy').addEventListener('click', sysProxy);
     document.querySelector('#direct-proxy').addEventListener('click', directProxy);
     document.querySelector('#auto-detect').addEventListener('click', autoProxy);
-
+    if(httpHost && httpPort){
+        document.querySelector('#http-proxy').click();
+    }
+    
     $('[data-i18n-content]').each(function() {
         var message = chrome.i18n.getMessage(this.getAttribute('data-i18n-content'));
         if (message)
